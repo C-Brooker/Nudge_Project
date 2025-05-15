@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -33,6 +33,9 @@ export class AuthService {
   async login(
     user: any,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    const secret = process.env.JWT_SECRET;
+    const refreshSecret = process.env.REFRESH_JWT_SECRET;
+
     if (!user) {
       throw new Error('User Authentication Failed');
     }
@@ -40,11 +43,11 @@ export class AuthService {
       const payload = { username: user.username, sub: user.id };
 
       const accessToken = await this.jwtService.signAsync(payload, {
-        secret: 'secret',
+        secret: secret,
         expiresIn: '15m',
       });
       const refreshToken = await this.jwtService.signAsync(payload, {
-        secret: 'refresh_secret',
+        secret: refreshSecret,
         expiresIn: '7d',
       });
 
@@ -69,5 +72,10 @@ export class AuthService {
     });
 
     await this.refreshTokenRepository.save(refreshToken);
+  }
+
+  async logout(userId: number): Promise<void> {
+    const user = await this.usersService.findOneByID(userId);
+    await this.refreshTokenRepository.delete({ user: user });
   }
 }

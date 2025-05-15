@@ -6,12 +6,15 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Profile } from 'src/profiles/entities/profile.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profilesRepository: Repository<Profile>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { username, email, password } = createUserDto;
@@ -33,6 +36,7 @@ export class UsersService {
       username: username,
       email: email,
       password: hashedPassword,
+      profile: this.profilesRepository.create(),
     });
     return await this.usersRepository.save(userToAdd);
   }

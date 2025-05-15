@@ -24,13 +24,10 @@ export class AuthController {
     return this.authService.login(req.user); //Access and Refresh Token to be Used on Frontend
   }
 
-  //@Delete('logout')
-  //async logout(@)
-
-  //Example of an authguard
-  //@UseGuards(JwtAuthGuard)
-  //@Get('profile')
-  //getProfile(@Request() req) {
-  //return req.user;
-  //}
+  @UseGuards(JwtAuthGuard)
+  @Delete('logout')
+  async logout(@Request() req: any) {
+    const userId = req.user.id;
+    return this.authService.logout(userId);
+  }
 }
