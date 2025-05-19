@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -7,13 +7,12 @@ import { PaperProvider, DefaultTheme, MD3DarkTheme } from "react-native-paper";
 import * as Notifications from "expo-notifications";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/useAuthStore";
-import AppInit from "@/services/authService";
+import { useAuthStore } from "@/stores/useAuthStore";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const hydrated = useAuthStore((s) => s.hydrated);
   const colorScheme = useColorScheme();
   const theme =
     colorScheme === "light"
@@ -33,7 +32,7 @@ export default function RootLayout() {
     if (!loaded) {
       return;
     }
-
+    if (hydrated) SplashScreen.hideAsync();
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: true,
@@ -44,17 +43,15 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, hydrated]);
 
   return (
-    <AppInit>
-      <PaperProvider theme={theme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(app)/(tabs)" />
-          <Stack.Screen name="(guest)/(tabs)" />
-        </Stack>
-        <StatusBar style="auto" />
-      </PaperProvider>
-    </AppInit>
+    <PaperProvider theme={theme}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(app)/(tabs)" />
+        <Stack.Screen name="(guest)/(tabs)" />
+      </Stack>
+      <StatusBar style="auto" />
+    </PaperProvider>
   );
 }

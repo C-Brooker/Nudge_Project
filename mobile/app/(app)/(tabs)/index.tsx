@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Reminder from "@/components/Reminder";
-import { useReminderStore } from "@/store/useReminderStore";
+import { useReminderStore } from "@/stores/useReminderStore";
 import { ThemedView } from "@/components/ThemedView";
 import { StyleSheet, Text } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";

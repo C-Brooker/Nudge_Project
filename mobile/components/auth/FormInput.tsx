@@ -3,7 +3,7 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { Controller } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
-import { FormInputProp } from "@/types/formTypes";
+import { FormInputProp } from "@/components/auth/formTypes";
 
 interface TextInputFieldProps {
   value: string;

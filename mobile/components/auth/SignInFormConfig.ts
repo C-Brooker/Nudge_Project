@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FieldConfig } from "@/types/formTypes";
+import { FieldConfig } from "@/components/auth/formTypes";
 
 export const LoginSchema = z.object({
   username: z.string().min(1, { message: "Username is Required" }),

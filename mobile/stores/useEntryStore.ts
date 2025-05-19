@@ -2,18 +2,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface Entry {
+export interface Entry {
   id: number;
   content: string;
+  color: string;
+  habit: string | null;
   createdAt: string;
 }
 interface EntryStore {
   entries: Entry[];
   nextId: number;
 
-  addEntry: (content: string) => void;
+  addEntry: (content: string, habit?: string | null, color?: string) => void;
   removeEntry: (id: number) => void;
-  editEntry: (id: number, newContent: string) => void;
+  editEntry: (
+    id: number,
+    newContent: string,
+    newHabit?: string,
+    newColor?: string
+  ) => void;
   clearEntries: () => void;
 }
 
@@ -23,11 +30,21 @@ export const useEntryStore = create<EntryStore>()(
       entries: [],
       nextId: 1,
 
-      addEntry: (content: string) =>
+      addEntry: (
+        content: string,
+        habit: string | null = null,
+        color: string = ""
+      ) =>
         set((state) => ({
           entries: [
             ...state.entries,
-            { id: state.nextId, content, createdAt: new Date().toISOString() },
+            {
+              id: state.nextId,
+              content,
+              color,
+              habit,
+              createdAt: new Date().toISOString(),
+            },
           ],
           nextId: state.nextId + 1,
         })),

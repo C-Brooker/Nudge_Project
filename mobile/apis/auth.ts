@@ -1,9 +1,6 @@
-import { date } from "zod";
-import * as Token from "../services/authService";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useProfileStore } from "@/store/useProfileStore";
-import { useRouter } from "expo-router";
-import { useAchievementStore } from "@/store/useAchievementStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useProfileStore } from "@/stores/useProfileStore";
+import { useAchievementStore } from "@/stores/useAchievementStore";
 
 interface RegisterData {
   username: string;
@@ -58,10 +55,7 @@ export const loginUser = async (data: LoginData) => {
   const { accessToken, refreshToken } = await response.json();
 
   //Persisting tokens in async - Permanent
-  await Token.storeTokens({ accessToken, refreshToken });
-
-  //Persisting tokens in local memory - Temporary
-  useAuthStore.getState().setTokens(accessToken, refreshToken);
+  await useAuthStore.getState().setTokens(accessToken, refreshToken);
 
   const profile = await getProfile();
   useProfileStore.getState().setProfile(profile);
@@ -101,8 +95,7 @@ export const logoutUser = async () => {
 
     if (!response.ok) throw new Error("Failed to Logout");
 
-    await Token.clearTokens();
-    useAuthStore.getState().clearAuth();
+    await useAuthStore.getState().clearAuth();
     useProfileStore.getState().clearProfile();
   } catch (error) {
     throw error;

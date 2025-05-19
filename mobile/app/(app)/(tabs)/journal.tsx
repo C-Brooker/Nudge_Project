@@ -1,138 +1,172 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
+  FlatList,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
+  ScrollView,
 } from "react-native";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import Layout from "@/components/Layout";
-import {
-  RichEditor,
-  RichToolbar,
-  actions,
-} from "react-native-pell-rich-editor";
-import { Picker } from "@react-native-picker/picker";
+import { useEntryStore, Entry } from "@/stores/useEntryStore";
+import EntryBubble from "@/components/EntryBubble";
+import { useRouter } from "expo-router";
 
-export default function JournalEntryScreen() {
-  const richRef = useRef<RichEditor>(null);
-  const [fontSize, setFontSize] = useState<number>(16);
+export default function JournalScreen() {
+  const habits = ["Running", "Swimming", "Eating", "Fishing", "Walking"];
+  const entries = useEntryStore((state) => state.entries);
+  console.log(entries);
+  const router = useRouter();
+  const [habitFilter, setHabitFilter] = useState<string>("all");
 
-  /* placeholder save */
-  const handleSave = async () => {
-    //const html = await richRef.current?.getContentHtml();
-    //console.log("Saving entry:", html);
+  const addEntry = () => {
+    router.replace("/(app)/(tabs)/entry");
   };
 
-  // Date header
-  const date = new Date();
-  const dateStr = date.toLocaleDateString();
-  const timeStr = date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const filteredEntries = useMemo(() => {
+    return habitFilter === "all"
+      ? entries
+      : entries.filter((e) => e.habit === habitFilter);
+  }, [entries, habitFilter]);
 
-  /* Inject CSS to control the current font size */
-  const editorStyle = {
-    contentCSSText: `font-size: ${fontSize}px;`,
-  } as const;
+  const renderEntry = ({ item }: { item: Entry }) => (
+    <EntryBubble
+      createdAt={item.createdAt}
+      content={item.content}
+      habit={item.habit}
+      color={item.color}
+    />
+  );
 
   return (
-    <Layout name="New Entry">
-      <KeyboardAvoidingView
-        style={styles.full}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        {/* ─── Toolbar (custom) ─────────────────────────────── */}
-        <View style={styles.toolbarRow}>
-          {/* Font‑size picker */}
-          <View style={styles.pickerWrap}>
-            <Picker
-              selectedValue={fontSize}
-              onValueChange={(v) => setFontSize(v)}
-              mode="dropdown"
-              style={Platform.OS === "ios" ? undefined : styles.pickerAndroid}
+    <Layout name="Journal">
+      <View style={styles.toolbarRow}>
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            habitFilter === "all" && styles.activeFilter,
+          ]}
+          onPress={() => setHabitFilter("all")}
+        >
+          <Text
+            style={[
+              styles.filterLabel,
+              habitFilter === "all" && styles.activeFilterLabel,
+            ]}
+          >
+            All
+          </Text>
+        </TouchableOpacity>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScroll}
+        >
+          {habits.map((h) => (
+            <TouchableOpacity
+              key={h}
+              style={[
+                styles.filterButton,
+                habitFilter === h && styles.activeFilter,
+              ]}
+              onPress={() => setHabitFilter(h)}
             >
-              {[8, 10, 11, 12, 15, 20].map((s) => (
-                <Picker.Item key={s} label={`${s}`} value={s} />
-              ))}
-            </Picker>
+              <Text
+                style={[
+                  styles.filterLabel,
+                  habitFilter === h && styles.activeFilterLabel,
+                ]}
+              >
+                {h}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Journal entries list */}
+      <FlatList
+        data={filteredEntries}
+        keyExtractor={(item) => String(item.id)}
+        style={styles.listSize}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="edit" size={24} color="#9CA3AF" />
+            <Text style={styles.emptyText}>New Note</Text>
           </View>
+        }
+        renderItem={renderEntry}
+      />
 
-          {/* Bold / Underline / Italic via RichToolbar */}
-          <RichToolbar
-            editor={richRef}
-            actions={[actions.setBold, actions.setUnderline, actions.setItalic]}
-            iconTint="#4b5563"
-            selectedIconTint="#111827"
-            iconSize={24}
-            style={styles.richToolbar}
-          />
-
-          {/* Save */}
-          <TouchableOpacity onPress={handleSave} style={styles.saveBtn}>
-            <Ionicons name="save" size={24} color="#4b5563" />
-          </TouchableOpacity>
-        </View>
-
-        {/* date */}
-        <Text style={styles.dateText}>{`${dateStr} ${timeStr}`}</Text>
-
-        {/* ─── Rich Editor ──────────────────────────────────── */}
-        <RichEditor
-          ref={richRef}
-          editorStyle={editorStyle}
-          placeholder="Start writing…"
-          style={styles.editor}
-          initialHeight={300}
-        />
-      </KeyboardAvoidingView>
+      <TouchableOpacity style={styles.fab} onPress={addEntry}>
+        <MaterialIcons name="add" size={24} color="white" />
+      </TouchableOpacity>
     </Layout>
   );
 }
 
-/* ───────── styles ───────────────────────────────────────────── */
 const styles = StyleSheet.create({
-  full: { height: "90%", width: "100%" },
+  filterScroll: {
+    paddingLeft: 8, // space between “All” and first habit
+    paddingRight: 12,
+  },
   toolbarRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f3f3f3",
+    backgroundColor: "white",
   },
-  pickerWrap: {
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
-    overflow: "hidden",
+  filterButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: "#E5E5E5",
+    marginRight: 8,
   },
-  pickerAndroid: { width: 80, height: 36 },
-  richToolbar: { backgroundColor: "transparent" },
-  saveBtn: { padding: 6, borderRadius: 8 },
-  dateText: {
-    textAlign: "center",
-    fontSize: 13,
-    color: "#4b5563",
-    marginVertical: 6,
+  activeFilter: {
+    backgroundColor: "#111827",
   },
-  editor: {
+  filterLabel: {
+    fontSize: 14,
+    color: "#111827",
+  },
+  activeFilterLabel: {
+    color: "white",
+  },
+
+  listSize: {
+    width: "100%",
     flex: 1,
-    marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 10,
   },
-  bottomRow: {
-    flexDirection: "row",
+  listContent: {
+    paddingHorizontal: 12,
+    paddingBottom: 80,
+  },
+
+  emptyContainer: {
+    width: "100%",
     alignItems: "center",
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#f3f3f3",
+    marginTop: 32,
   },
-  spacer: { flex: 1 },
+  emptyText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#9CA3AF",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#111827",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+  },
 });

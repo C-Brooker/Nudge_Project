@@ -1,8 +1,8 @@
 import { logoutUser } from "@/apis";
 import AchievementsList from "@/components/game/Achievements";
 import Layout from "@/components/Layout";
-import { useAchievementStore } from "@/store/useAchievementStore";
-import { useProfileStore } from "@/store/useProfileStore";
+import { useAchievementStore } from "@/stores/useAchievementStore";
+import { useProfileStore } from "@/stores/useProfileStore";
 import { useState } from "react";
 import {
   View,

@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "./FormInput";
-import { FormProps } from "@/types/formTypes";
+import { FormProps } from "@/components/auth/formTypes";
 
 export default function Form({ schema, fields, onSubmit }: FormProps) {
   const {

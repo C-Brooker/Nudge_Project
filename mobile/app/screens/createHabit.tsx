@@ -7,7 +7,7 @@ import {
   ReminderSchema,
 } from "@/components/auth/ReminderFormConfig";
 import * as Notifications from "expo-notifications";
-import { useReminderStore } from "@/store/useReminderStore";
+import { useReminderStore } from "@/stores/useReminderStore";
 
 const requestPermissions = async () => {
   const { status } = await Notifications.requestPermissionsAsync();

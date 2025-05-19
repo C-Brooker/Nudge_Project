@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FieldConfig } from "@/types/formTypes";
+import { FieldConfig } from "@/components/auth/formTypes";
 
 export const ReminderSchema = z.object({
   name: z.string().min(1, { message: "Title is Required" }),
