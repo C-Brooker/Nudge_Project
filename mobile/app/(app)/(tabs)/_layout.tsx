@@ -26,7 +26,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="habits"
         options={{
           title: "Habits",
           tabBarIcon: ({ color }) => (
@@ -62,12 +62,28 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/*Hiding entry helper screens*/}
       <Tabs.Screen
-        name="entry"
-        options={{
-          title: "Entries",
-          href: null,
-        }}
+        name="entry/create"
+        options={{ href: null, tabBarItemStyle: null }}
+      />
+      <Tabs.Screen
+        name="entry/[id]"
+        options={{ href: null, tabBarItemStyle: null }}
+      />
+
+      {/* Hiding Habit helper screens*/}
+      <Tabs.Screen
+        name="habit/name"
+        options={{ href: null, tabBarItemStyle: null }}
+      />
+      <Tabs.Screen
+        name="habit/color"
+        options={{ href: null, tabBarItemStyle: null }}
+      />
+      <Tabs.Screen
+        name="habit/goal"
+        options={{ href: null, tabBarItemStyle: null }}
       />
     </Tabs>
   );

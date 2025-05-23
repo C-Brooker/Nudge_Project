@@ -12,6 +12,14 @@ buildscript {
   }
 }
 
+ext {
+  buildToolsVersion    = "35.0.0"
+  compileSdkVersion    = 35
+  targetSdkVersion     = 35
+  minSdkVersion        = 24
+  ndkVersion           = "25.1.8937393"
+}
+
 def reactNativeAndroidDir = new File(
   providers.exec {
     workingDir(rootDir)

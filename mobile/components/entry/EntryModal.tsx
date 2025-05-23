@@ -15,12 +15,20 @@ interface modalProps {
   onClose: () => void;
   onSave: (habit: string | null, color: string) => void;
   name: string;
+  color: string | null;
+  habit: string | null;
 }
 
-export default function EntryModal({ visible, onClose, onSave }: modalProps) {
+export default function EntryModal({
+  visible,
+  onClose,
+  onSave,
+  color,
+  habit,
+}: modalProps) {
   const habits = ["Running", "Walking", "Eating"];
-  const [selectedColor, setSelectedColor] = useState("#e5e5e5");
-  const [selectedHabit, setSelectedHabit] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(color ?? "#e5e5e5");
+  const [selectedHabit, setSelectedHabit] = useState(habit ?? null);
 
   const handleSave = () => {
     onSave(selectedHabit, selectedColor);

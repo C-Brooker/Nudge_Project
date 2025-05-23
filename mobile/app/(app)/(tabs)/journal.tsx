@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,52 @@ import {
   FlatList,
   StyleSheet,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Layout from "@/components/Layout";
 import { useEntryStore, Entry } from "@/stores/useEntryStore";
-import EntryBubble from "@/components/EntryBubble";
+import EntryBubble from "@/components/entry/EntryBubble";
 import { useRouter } from "expo-router";
+import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import ActionButton from "@/components/ActionButton";
 
 export default function JournalScreen() {
-  const habits = ["Running", "Swimming", "Eating", "Fishing", "Walking"];
-  const entries = useEntryStore((state) => state.entries);
-  console.log(entries);
   const router = useRouter();
+  const entries = useEntryStore((state) => state.entries);
+  const removeEntry = useEntryStore((state) => state.removeEntry);
+  const actionSheetRef = useRef<ActionSheetRef>(null);
+  const [selectedEntry, setSelectedEntry] = useState<number | null>(null);
   const [habitFilter, setHabitFilter] = useState<string>("all");
 
+  const habits = ["Running", "Swimming", "Eating", "Fishing", "Walking"];
+
   const addEntry = () => {
-    router.replace("/(app)/(tabs)/entry");
+    router.replace("/(app)/(tabs)/entry/create");
+  };
+
+  const editEntry = () => {
+    if (selectedEntry) {
+      router.replace({
+        pathname: "/(app)/(tabs)/entry/[id]",
+        params: { id: String(selectedEntry) },
+      });
+      hideMenu();
+    }
+  };
+  const deleteEntry = () => {
+    if (selectedEntry) {
+      removeEntry(selectedEntry);
+      hideMenu();
+    }
+  };
+  const showMenu = (id: number) => {
+    setSelectedEntry(id);
+    actionSheetRef.current?.show();
+  };
+  const hideMenu = () => {
+    setSelectedEntry(null);
+    actionSheetRef.current?.hide();
   };
 
   const filteredEntries = useMemo(() => {
@@ -32,10 +62,16 @@ export default function JournalScreen() {
 
   const renderEntry = ({ item }: { item: Entry }) => (
     <EntryBubble
+      id={item.id}
       createdAt={item.createdAt}
       content={item.content}
       habit={item.habit}
       color={item.color}
+      onShortPress={() => hideMenu()}
+      onLongPress={(id: number) => {
+        showMenu(id);
+      }}
+      selected={selectedEntry == item.id}
     />
   );
 
@@ -87,30 +123,59 @@ export default function JournalScreen() {
       </View>
 
       {/* Journal entries list */}
-      <FlatList
-        data={filteredEntries}
-        keyExtractor={(item) => String(item.id)}
-        style={styles.listSize}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <MaterialIcons name="edit" size={24} color="#9CA3AF" />
-            <Text style={styles.emptyText}>New Note</Text>
-          </View>
-        }
-        renderItem={renderEntry}
-      />
+      <Pressable style={styles.listSize} onPress={() => hideMenu()}>
+        <FlatList
+          data={filteredEntries}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <MaterialIcons name="edit" size={24} color="#9CA3AF" />
+              <Text style={styles.emptyText}>New Note</Text>
+            </View>
+          }
+          renderItem={renderEntry}
+        />
+      </Pressable>
 
-      <TouchableOpacity style={styles.fab} onPress={addEntry}>
-        <MaterialIcons name="add" size={24} color="white" />
-      </TouchableOpacity>
+      <ActionButton style={styles.btmright} name="add" onPress={addEntry} />
+
+      <ActionSheet
+        ref={actionSheetRef}
+        isModal={false}
+        backgroundInteractionEnabled={true}
+        closeOnTouchBackdrop={true}
+        gestureEnabled={true}
+        overdrawSize={0}
+        containerStyle={styles.sheetContainer}
+        snapPoints={[60]}
+        initialSnapIndex={0}
+        onTouchBackdrop={() => actionSheetRef.current?.hide()}
+        onBeforeClose={() => setSelectedEntry(null)}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 24,
+          }}
+        >
+          <ActionButton name="edit" onPress={editEntry} />
+          <ActionButton
+            style={[{ backgroundColor: "red" }]}
+            name="delete"
+            onPress={deleteEntry}
+          />
+        </View>
+      </ActionSheet>
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
   filterScroll: {
-    paddingLeft: 8, // space between “All” and first habit
+    paddingLeft: 8,
     paddingRight: 12,
   },
   toolbarRow: {
@@ -138,13 +203,18 @@ const styles = StyleSheet.create({
     color: "white",
   },
 
+  sheetContainer: {
+    height: 100,
+    borderWidth: 1,
+  },
+
   listSize: {
     width: "100%",
     flex: 1,
   },
   listContent: {
     paddingHorizontal: 12,
-    paddingBottom: 80,
+    paddingBottom: 10,
   },
 
   emptyContainer: {
@@ -157,16 +227,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#9CA3AF",
   },
-  fab: {
+
+  btmright: {
     position: "absolute",
-    bottom: 24,
     right: 24,
-    backgroundColor: "#111827",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
+    bottom: 24,
   },
 });

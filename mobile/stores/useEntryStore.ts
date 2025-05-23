@@ -14,19 +14,20 @@ interface EntryStore {
   nextId: number;
 
   addEntry: (content: string, habit?: string | null, color?: string) => void;
+  getEntry: (id: number) => Entry | null;
   removeEntry: (id: number) => void;
   editEntry: (
     id: number,
     newContent: string,
-    newHabit?: string,
-    newColor?: string
+    newHabit: string | null,
+    newColor: string
   ) => void;
   clearEntries: () => void;
 }
 
 export const useEntryStore = create<EntryStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       entries: [],
       nextId: 1,
 
@@ -49,18 +50,29 @@ export const useEntryStore = create<EntryStore>()(
           nextId: state.nextId + 1,
         })),
 
+      getEntry: (id: number) => {
+        const entry = get().entries.find((entry) => entry.id === id);
+        return entry ?? null;
+      },
       removeEntry: (id: number) =>
         set((state) => ({
           entries: state.entries.filter((entry) => entry.id !== id),
         })),
 
-      editEntry: (id: number, newContent: string) =>
+      editEntry: (
+        id: number,
+        newContent: string,
+        newHabit: string | null,
+        newColor: string
+      ) =>
         set((state) => ({
           entries: state.entries.map((entry) =>
             entry.id === id
               ? {
                   ...entry,
                   content: newContent,
+                  habit: newHabit,
+                  color: newColor,
                   createdAt: new Date().toISOString(),
                 }
               : entry

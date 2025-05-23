@@ -4,6 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { PaperProvider, DefaultTheme, MD3DarkTheme } from "react-native-paper";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -13,6 +14,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const hydrated = useAuthStore((s) => s.hydrated);
+  const isLoggedIn = useAuthStore().isLoggedIn;
   const colorScheme = useColorScheme();
   const theme =
     colorScheme === "light"
@@ -47,11 +49,14 @@ export default function RootLayout() {
 
   return (
     <PaperProvider theme={theme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(app)/(tabs)" />
-        <Stack.Screen name="(guest)/(tabs)" />
-      </Stack>
-      <StatusBar style="auto" />
+      <GestureHandlerRootView>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(app)/(tabs)" />
+
+          <Stack.Screen name="(guest)/(tabs)" />
+        </Stack>
+        <StatusBar style="auto" />
+      </GestureHandlerRootView>
     </PaperProvider>
   );
 }

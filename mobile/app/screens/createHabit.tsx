@@ -1,13 +1,12 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { ThemedView } from "@/components/ThemedView";
+import { StyleSheet, View } from "react-native";
 import Form from "@/components/auth/Form";
 import {
   ReminderFields,
   ReminderSchema,
 } from "@/components/auth/ReminderFormConfig";
 import * as Notifications from "expo-notifications";
-import { useReminderStore } from "@/stores/useReminderStore";
+import { useReminderStore } from "@/stores/useHabitStore";
 
 const requestPermissions = async () => {
   const { status } = await Notifications.requestPermissionsAsync();
@@ -42,13 +41,13 @@ const handleSubmit = (data: FormData) => {
 
 export default function HabitScreen() {
   return (
-    <ThemedView style={styles.titleContainer}>
+    <View style={styles.titleContainer}>
       <Form
         schema={ReminderSchema}
         fields={ReminderFields}
         onSubmit={handleSubmit}
       />
-    </ThemedView>
+    </View>
   );
 }
 const styles = StyleSheet.create({

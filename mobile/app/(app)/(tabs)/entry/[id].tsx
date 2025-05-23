@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -14,20 +14,37 @@ import {
   actions,
 } from "react-native-pell-rich-editor";
 import { useEntryStore } from "@/stores/useEntryStore";
-import { useRouter } from "expo-router";
-import EntryModal from "@/components/EntryModal";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import EntryModal from "@/components/entry/EntryModal";
 
-export default function EntryScreen(isEdit?: boolean) {
+export default function EntryScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams();
   const richRef = useRef<RichEditor>(null);
-  const store = useEntryStore();
+  const getEntry = useEntryStore((state) => state.getEntry);
+  const editEntry = useEntryStore((state) => state.editEntry);
   const [content, setContent] = useState<string>("");
+  const [color, setColor] = useState<string | null>(null);
+  const [habit, setHabit] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const entry = getEntry(Number(id));
+
+  useEffect(() => {
+    if (!entry) {
+      router.replace("/(app)/(tabs)/journal");
+      return;
+    } else {
+      richRef?.current?.setContentHTML(entry.content);
+      setContent(entry.content);
+      setColor(entry.color);
+      setHabit(entry.habit);
+    }
+  }, [id]);
   //Save to store, clear editor, route to journal page
   const handleSave = (habit: string | null, color: string) => {
     if (!content.trim()) return;
-    store.addEntry(content, habit, color);
+    editEntry(Number(id), content, habit, color);
     setContent("");
     richRef.current?.setContentHTML("");
     router.replace("/(app)/(tabs)/journal");
@@ -42,9 +59,11 @@ export default function EntryScreen(isEdit?: boolean) {
   });
 
   return (
-    <Layout name="New Entry">
+    <Layout name="Edit Entry">
       <EntryModal
         visible={modalVisible}
+        color={color}
+        habit={habit}
         onClose={() => setModalVisible(false)}
         onSave={(habit: string | null, color: string) =>
           handleSave(habit, color)
