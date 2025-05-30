@@ -105,7 +105,7 @@ docker-compose up -d
 # Stop the database
 docker-compose down
 
-## Available Scripts
+## Scripts
 
 ### Backend
 - `npm run start` - Start development server
@@ -118,12 +118,9 @@ docker-compose down
 - `npx expo start --web` - Run in web browser
 
 ## Project Structure
-
-```
 ├── backend/           # NestJS API server
 ├── frontend/          # React Native (Expo) app
 ├── backend/docker-compose.yml # Database configuration
 └── README.md
-```
 *Based on how Expo Go works there could be connection issues, and so tunneling could help.
 
