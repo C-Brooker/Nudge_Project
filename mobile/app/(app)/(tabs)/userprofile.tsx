@@ -1,20 +1,14 @@
-import { logoutUser } from "@/apis";
-import AchievementsList from "@/components/game/Achievements";
+import { logoutUser } from "@/apis/auth";
+import AchievementsList from "@/components/profile/Achievements";
 import Layout from "@/components/Layout";
+import StatCard from "@/components/profile/StatCard";
 import { useAchievementStore } from "@/stores/useAchievementStore";
 import { useProfileStore } from "@/stores/useProfileStore";
-import { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Switch,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import XPProgressBar from "@/components/profile/XPProgressBar";
 
 export default function ProfileAuthScreen() {
-  const { username, experience, level, coins } = useProfileStore();
+  const { username, level, coins, streak, habitsCompleted } = useProfileStore();
   const { unlockedKeys } = useAchievementStore();
 
   const handleLogout = async () => {
@@ -24,8 +18,7 @@ export default function ProfileAuthScreen() {
       console.log("Error: " + error);
     }
   };
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+
   return (
     <Layout name="Profile">
       <View style={styles.imageWrap}>
@@ -33,26 +26,27 @@ export default function ProfileAuthScreen() {
           source={require("../../../assets/images/avatar-placeholder.png")}
           style={styles.image}
         />
-        <Text style={styles.textBold}>Username: {username}</Text>
-        <Text style={styles.textBold}>Experience: {experience}</Text>
-        <Text style={styles.textBold}>Level: {level}</Text>
-        <Text style={styles.textBold}>Coins: {coins}</Text>
-        <AchievementsList unlockedKeys={unlockedKeys} />
+        <Text style={styles.textBold}>{username}</Text>
+        <View style={styles.statGrid}>
+          <StatCard
+            name="Total Habits"
+            value={habitsCompleted ?? 0}
+            icon="auto-awesome"
+          />
+          <StatCard name="Level" value={level ?? 1} icon="bubble-chart" />
+          <StatCard name="Coins" value={coins ?? 0} icon="attach-money" />
+          <StatCard
+            name="Longest Streak"
+            value={streak ?? 0}
+            icon="local-fire-department"
+          />
+        </View>
+        <XPProgressBar />
+        <TouchableOpacity style={styles.primaryBtn} onPress={handleLogout}>
+          <Text style={styles.primaryText}>Log out</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={handleLogout}>
-        <Text>Logout</Text>
-      </TouchableOpacity>
-
-      <View style={styles.switches}>
-        <Text style={styles.textBold}>Dark Mode</Text>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
-      </View>
+      <AchievementsList unlockedKeys={unlockedKeys} />
     </Layout>
   );
 }
@@ -68,25 +62,28 @@ const styles = StyleSheet.create({
     height: 100,
   },
   textBold: {
-    fontSize: 16,
-    color: "#4b5563",
+    fontSize: 22,
+    color: "black",
     textAlign: "center",
-    marginHorizontal: 12,
-    lineHeight: 22,
     fontWeight: "bold",
   },
-  textCenter: {
-    fontSize: 13,
-    color: "#4b5563",
-    textAlign: "center",
-    marginHorizontal: 12,
-    lineHeight: 22,
+  statGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    rowGap: 10,
+    columnGap: 10,
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 5,
+    paddingVertical: 20,
   },
   primaryBtn: {
-    flexDirection: "row",
+    marginTop: 10,
+    width: 200,
     alignItems: "center",
-    paddingHorizontal: 28,
-    paddingVertical: 14,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
     borderRadius: 12,
     backgroundColor: "#111827",
     marginBottom: 12,

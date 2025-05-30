@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -133,7 +133,6 @@ export default function EntryScreen() {
   );
 }
 
-/* ───────── styles ───────────────────────────────────────────── */
 const styles = StyleSheet.create({
   full: { height: "90%", width: "100%" },
   toolbarRow: {

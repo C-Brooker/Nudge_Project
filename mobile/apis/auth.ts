@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useProfileStore } from "@/stores/useProfileStore";
 import { useAchievementStore } from "@/stores/useAchievementStore";
+import { useRouter } from "expo-router";
 
 interface RegisterData {
   username: string;
@@ -59,6 +60,7 @@ export const loginUser = async (data: LoginData) => {
 
   const profile = await getProfile();
   useProfileStore.getState().setProfile(profile);
+  useRouter().navigate("/(app)/(tabs)/habits");
 };
 
 export const getProfile = async () => {
@@ -84,6 +86,7 @@ export const logoutUser = async () => {
   useAuthStore.getState().clearAuth();
   useProfileStore.getState().clearProfile();
   useAchievementStore.getState().clearAchievements();
+  useRouter().navigate("/(guest)/(tabs)/habits");
   try {
     const response = await fetch(
       process.env.EXPO_PUBLIC_APP_URL + "/auth/logout",

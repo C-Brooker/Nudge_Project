@@ -1,4 +1,4 @@
-import BackNextButtons from "@/components/habit/BackNextButton";
+import BackNextButtons from "@/components/creator/BackNextButton";
 import Layout from "@/components/Layout";
 import { useCreatorStore } from "@/stores/useCreatorStore";
 import { router } from "expo-router";

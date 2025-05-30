@@ -1,10 +1,10 @@
-import BackNextButtons from "@/components/habit/BackNextButton";
+import BackNextButtons from "@/components/creator/BackNextButton";
 import Layout from "@/components/Layout";
 import { useCreatorStore } from "@/stores/useCreatorStore";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import Suggestions from "@/components/habit/Suggestions";
+import Suggestions from "@/components/creator/Suggestions";
 import { router } from "expo-router";
 
 export default function Name() {
@@ -50,7 +50,7 @@ export default function Name() {
           <Text style={styles.subTextStyle}>Or</Text>
         </View>
         <Text style={styles.subTextStyle}>Pick from some Suggested Habits</Text>
-        <Suggestions />
+        <Suggestions type="(app)" />
       </View>
       <BackNextButtons onBack={back} onNext={next} />
     </Layout>

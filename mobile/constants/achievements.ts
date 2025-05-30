@@ -5,42 +5,9 @@ export interface AchievementDef {
   level?: number;
   streak?: number;
   coins?: number;
-
-  trigger?:
-    | "habit_created"
-    | "journal_entry"
-    | "send_buddy_msg"
-    | "shop_purchase"
-    | "shop_complete";
 }
 
 export const ACHIEVEMENTS: AchievementDef[] = [
-  {
-    key: "habit_first",
-    name: "Create your first habit",
-    trigger: "habit_created",
-  },
-  {
-    key: "journal_first",
-    name: "Write your first journal entry",
-    trigger: "journal_entry",
-  },
-  {
-    key: "buddy_first",
-    name: "Send a message to your buddy",
-    trigger: "send_buddy_msg",
-  },
-  {
-    key: "shop_first",
-    name: "Purchase your first item in the shop",
-    trigger: "shop_purchase",
-  },
-  {
-    key: "shop_last",
-    name: "Purchase every item in the shop",
-    trigger: "shop_complete",
-  },
-
   { key: "habit_1", name: "Complete 1 Habit", habits: 1 },
   { key: "habit_5", name: "Complete 5 Habits", habits: 5 },
   { key: "habit_10", name: "Complete 10 Habits", habits: 10 },

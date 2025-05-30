@@ -1,5 +1,6 @@
+import { useHabitStore } from "@/stores/useHabitStore";
 import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -15,8 +16,8 @@ interface modalProps {
   onClose: () => void;
   onSave: (habit: string | null, color: string) => void;
   name: string;
-  color: string | null;
-  habit: string | null;
+  color?: string | null;
+  habit?: string | null;
 }
 
 export default function EntryModal({
@@ -26,7 +27,12 @@ export default function EntryModal({
   color,
   habit,
 }: modalProps) {
-  const habits = ["Running", "Walking", "Eating"];
+  const allHabits = useHabitStore((state) => state.habits);
+  const habits = useMemo(() => {
+    const names = allHabits.map((habit) => habit.name);
+    return [...new Set(names)];
+  }, [allHabits]);
+
   const [selectedColor, setSelectedColor] = useState(color ?? "#e5e5e5");
   const [selectedHabit, setSelectedHabit] = useState(habit ?? null);
 

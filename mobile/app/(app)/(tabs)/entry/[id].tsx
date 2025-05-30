@@ -151,8 +151,6 @@ export default function EntryScreen() {
     </Layout>
   );
 }
-
-/* ───────── styles ───────────────────────────────────────────── */
 const styles = StyleSheet.create({
   full: { height: "90%", width: "100%" },
   toolbarRow: {

@@ -8,6 +8,10 @@ interface AchievementState {
   has: (key: AchievementKey) => boolean;
   setUnlocked: (keys: AchievementKey[]) => void;
   unlockOne: (key: AchievementKey) => void;
+  checkAchievements: (
+    stats: any,
+    unlockedKeys: AchievementKey[]
+  ) => AchievementKey[];
   loadFromApi: () => Promise<void>;
   clearAchievements: () => void;
 }
@@ -24,6 +28,47 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
     if (!unlockedKeys.includes(key)) {
       set({ unlockedKeys: [...unlockedKeys, key] });
     }
+  },
+
+  checkAchievements: (stats, unlockedKeys) => {
+    const newAchievements: AchievementKey[] = [];
+
+    ACHIEVEMENTS.forEach((achievement) => {
+      if (unlockedKeys.includes(achievement.key)) return;
+
+      let shouldUnlock = false;
+
+      if (achievement.habits && stats.totalCompletions >= achievement.habits) {
+        shouldUnlock = true;
+      }
+
+      if (achievement.level && stats.level >= achievement.level) {
+        shouldUnlock = true;
+      }
+
+      if (achievement.streak && stats.longestStreak >= achievement.streak) {
+        shouldUnlock = true;
+      }
+
+      if (achievement.coins && stats.coins >= achievement.coins) {
+        shouldUnlock = true;
+      }
+
+      if (achievement.key === "all_achievements") {
+        const totalAchievements = ACHIEVEMENTS.length - 1;
+        const completedAchievements =
+          unlockedKeys.length + newAchievements.length;
+        if (completedAchievements >= totalAchievements) {
+          shouldUnlock = true;
+        }
+      }
+
+      if (shouldUnlock) {
+        newAchievements.push(achievement.key);
+      }
+    });
+
+    return newAchievements;
   },
 
   loadFromApi: async () => {

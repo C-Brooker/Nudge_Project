@@ -10,7 +10,7 @@ import {
   registerFields,
 } from "@/components/auth/SignupFormConfig";
 import Form from "@/components/auth/Form";
-import { registerUser } from "@/apis";
+import { registerUser } from "@/apis/auth";
 import { Modal } from "react-native";
 import SocialRow from "./SocialRow";
 

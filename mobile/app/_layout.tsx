@@ -5,7 +5,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { PaperProvider, DefaultTheme, MD3DarkTheme } from "react-native-paper";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import * as Notifications from "expo-notifications";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -14,7 +13,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const hydrated = useAuthStore((s) => s.hydrated);
-  const isLoggedIn = useAuthStore().isLoggedIn;
+  const isLoggedIn = useAuthStore((s) => s.accessToken);
   const colorScheme = useColorScheme();
   const theme =
     colorScheme === "light"
@@ -35,13 +34,7 @@ export default function RootLayout() {
       return;
     }
     if (hydrated) SplashScreen.hideAsync();
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-      }),
-    });
+
     if (loaded) {
       SplashScreen.hideAsync();
     }
@@ -50,11 +43,16 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       <GestureHandlerRootView>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(app)/(tabs)" />
+        {isLoggedIn ? (
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(app)/(tabs)" />
+          </Stack>
+        ) : (
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(guest)/(tabs)" />
+          </Stack>
+        )}
 
-          <Stack.Screen name="(guest)/(tabs)" />
-        </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>
     </PaperProvider>

@@ -14,33 +14,41 @@ import { useEntryStore, Entry } from "@/stores/useEntryStore";
 import EntryBubble from "@/components/entry/EntryBubble";
 import { useRouter } from "expo-router";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import ActionButton from "@/components/ActionButton";
+import { useHabitStore } from "@/stores/useHabitStore";
 
 export default function JournalScreen() {
   const router = useRouter();
   const entries = useEntryStore((state) => state.entries);
   const removeEntry = useEntryStore((state) => state.removeEntry);
-
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const [selectedEntry, setSelectedEntry] = useState<number | null>(null);
   const [habitFilter, setHabitFilter] = useState<string>("all");
-
-  const habits = ["Running", "Swimming", "Eating", "Fishing", "Walking"];
+  const allHabits = useHabitStore((state) => state.habits);
+  const habits = useMemo(() => {
+    const names = allHabits.map((habit) => habit.name);
+    return [...new Set(names)];
+  }, [allHabits]);
 
   const addEntry = () => {
-    router.replace("/(app)/(tabs)/entry");
+    router.replace("/(guest)/(tabs)/entry/create");
   };
 
   const editEntry = () => {
-    router.replace("/(app)/(tabs)/entry");
+    if (selectedEntry) {
+      router.replace({
+        pathname: "/(guest)/(tabs)/entry/[id]",
+        params: { id: String(selectedEntry) },
+      });
+      hideMenu();
+    }
   };
-
   const deleteEntry = () => {
     if (selectedEntry) {
       removeEntry(selectedEntry);
       hideMenu();
     }
   };
-
   const showMenu = (id: number) => {
     setSelectedEntry(id);
     actionSheetRef.current?.show();
@@ -119,11 +127,10 @@ export default function JournalScreen() {
       </View>
 
       {/* Journal entries list */}
-      <Pressable onPress={() => hideMenu()}>
+      <Pressable style={styles.listSize} onPress={() => hideMenu()}>
         <FlatList
           data={filteredEntries}
           keyExtractor={(item) => String(item.id)}
-          style={styles.listSize}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -135,9 +142,7 @@ export default function JournalScreen() {
         />
       </Pressable>
 
-      <TouchableOpacity style={styles.fab} onPress={addEntry}>
-        <MaterialIcons name="add" size={24} color="white" />
-      </TouchableOpacity>
+      <ActionButton style={styles.btmright} name="add" onPress={addEntry} />
 
       <ActionSheet
         ref={actionSheetRef}
@@ -146,10 +151,7 @@ export default function JournalScreen() {
         closeOnTouchBackdrop={true}
         gestureEnabled={true}
         overdrawSize={0}
-        containerStyle={{
-          height: 100,
-          borderWidth: 1,
-        }}
+        containerStyle={styles.sheetContainer}
         snapPoints={[60]}
         initialSnapIndex={0}
         onTouchBackdrop={() => actionSheetRef.current?.hide()}
@@ -163,15 +165,12 @@ export default function JournalScreen() {
             paddingHorizontal: 24,
           }}
         >
-          <TouchableOpacity style={[styles.sheetButton]} onPress={editEntry}>
-            <MaterialIcons name="edit" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.sheetButton, { backgroundColor: "red" }]}
+          <ActionButton name="edit" onPress={editEntry} />
+          <ActionButton
+            style={[{ backgroundColor: "red" }]}
+            name="delete"
             onPress={deleteEntry}
-          >
-            <MaterialIcons name="delete" size={20} color="white" />
-          </TouchableOpacity>
+          />
         </View>
       </ActionSheet>
     </Layout>
@@ -208,13 +207,18 @@ const styles = StyleSheet.create({
     color: "white",
   },
 
+  sheetContainer: {
+    height: 100,
+    borderWidth: 1,
+  },
+
   listSize: {
     width: "100%",
     flex: 1,
   },
   listContent: {
     paddingHorizontal: 12,
-    paddingBottom: 80,
+    paddingBottom: 10,
   },
 
   emptyContainer: {
@@ -227,26 +231,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#9CA3AF",
   },
-  fab: {
+
+  btmright: {
     position: "absolute",
     right: 24,
     bottom: 24,
-    backgroundColor: "#111827",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
-  },
-
-  sheetButton: {
-    backgroundColor: "#111827",
-    width: 60,
-    height: 60,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
   },
 });

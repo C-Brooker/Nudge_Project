@@ -7,6 +7,9 @@ import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { ProfilesModule } from './profiles/profiles.module';
+import { HabitsModule } from './habits/habits.module';
+import { JournalModule } from './journal/journal.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { ProfilesModule } from './profiles/profiles.module';
     AuthModule,
     GeminiModule,
     ProfilesModule,
+    HabitsModule,
+    JournalModule,
+    AchievementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

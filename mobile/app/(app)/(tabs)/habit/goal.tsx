@@ -1,27 +1,29 @@
-import BackNextButtons from "@/components/habit/BackNextButton";
-import GoalModal from "@/components/habit/Modals/GoalModal";
-import CountModals from "@/components/habit/Modals/CountModals";
+import BackNextButtons from "@/components/creator/BackNextButton";
+import GoalModal from "@/components/creator/Modals/GoalModal";
+import CountModals from "@/components/creator/Modals/CountModals";
 import Layout from "@/components/Layout";
 import { useCreatorStore } from "@/stores/useCreatorStore";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
-import QuitModal from "@/components/habit/Modals/QuitModal";
-import SaveModal from "@/components/habit/Modals/SaveModel";
+import QuitModal from "@/components/creator/Modals/QuitModal";
+import SaveModal from "@/components/creator/Modals/SaveModel";
+import Slider from "@react-native-community/slider";
 
 const typeOptions = ["Count", "Quit"];
 
 export default function Goal() {
   const name = useCreatorStore((state) => state.name);
   const color = useCreatorStore((state) => state.color);
-  const creator = useCreatorStore((state) => state.getHabitDetails);
+  const dif = useCreatorStore((state) => state.setDifficulty);
   const setGoal = useCreatorStore((state) => state.setGoal);
-  const clearGoalAndReminder = useCreatorStore(
-    (state) => state.clearGoalAndReminder
-  );
+  const clearGoalAndReminder = useCreatorStore((state) => state.clearGoal);
 
   const [type, setType] = useState("Count");
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const difficulties = ["Very Easy", "Easy", "Medium", "Hard", "Very Hard"];
+  const [difficulty, setDifficulty] = useState(1);
 
   const [typeModalVisible, setTypeModalVisible] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -44,9 +46,9 @@ export default function Goal() {
     }
     if (type == "Count") {
       handleCountGoal();
+      dif(difficulty as 0 | 1 | 2 | 3 | 4);
     }
     setSaveModelVisible(true);
-    console.log(creator());
   };
 
   const handleGoalChange = (
@@ -83,6 +85,7 @@ export default function Goal() {
       timeframe: timeframe,
     });
   };
+
   const handleQuitGoal = () => {
     setGoal({ type: "Quit", date: selectedDate, milestones: isEnabled });
   };
@@ -145,7 +148,32 @@ export default function Goal() {
               </View>
             </View>
           ) : (
-            <CountModals onGoalChange={handleGoalChange} />
+            <View>
+              <CountModals onGoalChange={handleGoalChange} />
+              <View style={styles.difficultySection}>
+                <Text style={styles.infoText}>
+                  How Challenging is this Habit?
+                </Text>
+                <Text style={styles.difficultyText}>
+                  {difficulties[difficulty]}
+                </Text>
+                <Slider
+                  style={{
+                    width: 200,
+
+                    transform: [{ scale: 1.5 }],
+                  }}
+                  minimumValue={0}
+                  maximumValue={4}
+                  value={difficulty}
+                  onValueChange={(v) => setDifficulty(v)}
+                  step={1}
+                  thumbTintColor="black"
+                  minimumTrackTintColor="red"
+                  maximumTrackTintColor="green"
+                />
+              </View>
+            </View>
           )}
         </View>
 
@@ -165,7 +193,7 @@ export default function Goal() {
         />
         <SaveModal
           visible={saveModalVisible}
-          name={name}
+          name={name as string}
           color={color}
           onClose={() => setSaveModelVisible(false)}
         />
@@ -201,7 +229,6 @@ const styles = StyleSheet.create({
   },
   subContent: {
     marginTop: 20,
-    borderBottomWidth: 0.4,
   },
   quitSection: {
     alignItems: "center",
@@ -218,6 +245,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
+  difficultySection: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+    borderTopWidth: 0.5,
+  },
+  difficultyText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    padding: 10,
+  },
+
   milestoneLabel: {
     fontWeight: "bold",
     fontSize: 16,

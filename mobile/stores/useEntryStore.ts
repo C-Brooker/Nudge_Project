@@ -15,6 +15,7 @@ interface EntryStore {
 
   addEntry: (content: string, habit?: string | null, color?: string) => void;
   getEntry: (id: number) => Entry | null;
+  setEntries: (entries: Entry[]) => void;
   removeEntry: (id: number) => void;
   editEntry: (
     id: number,
@@ -78,7 +79,7 @@ export const useEntryStore = create<EntryStore>()(
               : entry
           ),
         })),
-
+      setEntries: (entries) => ({ entries }),
       clearEntries: () =>
         set({
           entries: [],

@@ -85,6 +85,12 @@ export default function TabLayout() {
         name="habit/goal"
         options={{ href: null, tabBarItemStyle: null }}
       />
+
+      {/* Hiding Notification helper screen*/}
+      <Tabs.Screen
+        name="notifications"
+        options={{ href: null, tabBarItemStyle: null }}
+      />
     </Tabs>
   );
 }

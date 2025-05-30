@@ -15,6 +15,7 @@ import EntryBubble from "@/components/entry/EntryBubble";
 import { useRouter } from "expo-router";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import ActionButton from "@/components/ActionButton";
+import { useHabitStore } from "@/stores/useHabitStore";
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -23,8 +24,11 @@ export default function JournalScreen() {
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const [selectedEntry, setSelectedEntry] = useState<number | null>(null);
   const [habitFilter, setHabitFilter] = useState<string>("all");
-
-  const habits = ["Running", "Swimming", "Eating", "Fishing", "Walking"];
+  const allHabits = useHabitStore((state) => state.habits);
+  const habits = useMemo(() => {
+    const names = allHabits.map((habit) => habit.name);
+    return [...new Set(names)];
+  }, [allHabits]);
 
   const addEntry = () => {
     router.replace("/(app)/(tabs)/entry/create");

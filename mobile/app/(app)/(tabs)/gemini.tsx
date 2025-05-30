@@ -26,7 +26,7 @@ export default function ChatScreen() {
   const [loading, setLoading] = useState(false);
   const listRef = useRef<FlatList>(null);
 
-  // ───────────────────────────────────────────── Fetch history on mount
+  //Get history on mount
   useEffect(() => {
     (async () => {
       try {
@@ -39,7 +39,6 @@ export default function ChatScreen() {
     })();
   }, []);
 
-  // ───────────────────────────────────────────── Send message
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -122,7 +121,6 @@ export default function ChatScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={90}
     >
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Habit Buddy</Text>
         <TouchableOpacity
@@ -135,7 +133,6 @@ export default function ChatScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Messages list */}
       <FlatList
         ref={listRef}
         data={messages}
@@ -145,7 +142,6 @@ export default function ChatScreen() {
         onContentSizeChange={scrollToEnd}
       />
 
-      {/* Input  */}
       <View style={styles.inputBar}>
         <TextInput
           style={styles.textInput}
@@ -174,7 +170,6 @@ export default function ChatScreen() {
   );
 }
 
-// ───────────────────────────────────────────── Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   header: {

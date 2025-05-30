@@ -21,12 +21,13 @@ interface ProfileState {
   addExperience: (experience: number) => void;
   addLevel: (level: number) => void;
   addCoins: (coins: number) => void;
-  IncrementHabit: () => void;
-  IncrementStreak: () => void;
+  incrementHabits: () => void;
+  setStreak: (streak: number) => void;
   clearProfile: () => void;
+  resetStats: () => void;
 }
 
-export const useProfileStore = create<ProfileState>((set) => ({
+export const useProfileStore = create<ProfileState>((set, get) => ({
   userId: null,
   username: null,
   experience: null,
@@ -54,13 +55,35 @@ export const useProfileStore = create<ProfileState>((set) => ({
       streak: streak,
     }),
 
-  addExperience: (experience: number) => set({ experience: +experience }),
-  addLevel: (level: number) => set({ level: +level }),
-  addCoins: (coins: number) => set({ coins: +coins }),
+  addExperience: (experience: number) =>
+    set((state) => ({
+      experience: Number(state.experience ?? 0) + Number(experience),
+    })),
 
-  IncrementHabit: () => set({ level: +1 }),
-  IncrementStreak: () => set({ level: +1 }),
+  addLevel: (level: number) => set({ level: level }),
 
+  addCoins: (coins: number) =>
+    set((state) => ({
+      coins: Number(state.coins ?? 0) + Number(coins),
+    })),
+
+  incrementHabits: () =>
+    set((state) => ({
+      habitsCompleted: (state.habitsCompleted ?? 0) + 1,
+    })),
+
+  setStreak: (streak: number) =>
+    set((state) => ({
+      streak: Math.max(state.streak ?? 0, streak),
+    })),
+
+  resetStats: () =>
+    set({
+      experience: 0,
+      level: 1,
+      coins: 0,
+      streak: 0,
+    }),
   clearProfile: () =>
     set({
       userId: null,

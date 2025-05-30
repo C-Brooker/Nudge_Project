@@ -2,24 +2,11 @@ import LoginModal from "@/components/auth/LoginModal";
 import RegisterModal from "@/components/auth/RegisterModal";
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Switch,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
-type Props = {
-  onPressSignIn: () => void;
-};
-
-export default function ProfileUnauthScreen({ onPressSignIn }: Props) {
-  const [isEnabled, setIsEnabled] = useState(false);
+export default function ProfileUnauthScreen() {
   const [loginVisible, setLoginVisible] = useState(false);
   const [registerVisible, setRegisterVisible] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   return (
     <Layout name="Profile">
       <LoginModal
@@ -55,22 +42,10 @@ export default function ProfileUnauthScreen({ onPressSignIn }: Props) {
       >
         <Text style={styles.primaryText}>Create Account / Log In</Text>
       </TouchableOpacity>
-      {/* Message */}
       <Text style={styles.textCenter}>
         Sign in to back up and sync your habits across devices and unlock more
         features
       </Text>
-
-      <View style={styles.switches}>
-        <Text style={styles.textBold}>Dark Mode</Text>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
-      </View>
     </Layout>
   );
 }
@@ -101,8 +76,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   primaryBtn: {
-    flexDirection: "row",
+    width: 250,
     alignItems: "center",
+    alignSelf: "center",
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 12,

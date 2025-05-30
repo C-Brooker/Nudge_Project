@@ -1,8 +1,7 @@
-// /store/useAuthStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
-import { getProfile } from "@/apis";
+import { getProfile } from "@/apis/auth";
 import { useProfileStore } from "@/stores/useProfileStore";
 
 interface Auth {
@@ -94,12 +93,12 @@ export const useAuthStore = create<Auth>()(
         removeItem: SecureStore.deleteItemAsync,
       },
 
-      /* Save only the bits we need to rehydrate */
+      /* Save access token hydration */
       partialize: (state) => ({
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
-      /* After rehydrate, kick-off the profile check */
+      /* After rehydration start profile check */
       onRehydrateStorage: () => (state) => {
         state?.initialise?.();
       },

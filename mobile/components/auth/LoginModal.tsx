@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { LoginSchema, LoginFields } from "@/components/auth/SignInFormConfig";
 import Form from "@/components/auth/Form";
-import { loginUser } from "@/apis";
+import { loginUser } from "@/apis/auth";
 import SocialRow from "./SocialRow";
 
 interface FormData {
